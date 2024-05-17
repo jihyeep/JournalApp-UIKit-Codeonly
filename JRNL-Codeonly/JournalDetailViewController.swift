@@ -127,7 +127,7 @@ class JournalDetailViewController: UITableViewController {
             ])
             return cell
         case 1:
-            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
+            let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
             cell.contentView.addSubview(ratingView)
             ratingView.centerXAnchor.constraint(equalTo: cell.contentView.centerXAnchor).isActive = true
             ratingView.centerYAnchor.constraint(equalTo: cell.contentView.centerYAnchor).isActive = true
