@@ -42,6 +42,7 @@ class SharedData {
     }
     
     func loadJournalEntriesData() {
+        // load는 save된 데이터를 가져오기 때문에 디렉토리 존재 여부를 검사하지 않아도 됨
         let fileURL = getDocumentDirectory().appendingPathComponent("journalEntriesData.json")
         do {
             let data = try Data(contentsOf: fileURL)
