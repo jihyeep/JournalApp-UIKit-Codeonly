@@ -7,8 +7,11 @@
 
 import UIKit
 import MapKit
+import CoreLocation
 
-class MapViewController: UIViewController {
+class MapViewController: UIViewController, CLLocationManagerDelegate {
+    
+    let locationManager = CLLocationManager()
     
     private lazy var mapView: MKMapView = {
         let mapView = MKMapView()
@@ -18,10 +21,9 @@ class MapViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        // view는 UIViewController의 root view
         view.backgroundColor = .white
-        navigationItem.title = "Map"
-        view.addSubview(mapView)
-        
+//      self.navigationItem.title = "Map"
         view.addSubview(mapView)
         
         let safeArea = view.safeAreaLayoutGuide
@@ -32,17 +34,31 @@ class MapViewController: UIViewController {
             mapView.trailingAnchor.constraint(equalTo: safeArea.trailingAnchor),
         ])
         
+        locationManager.delegate = self
+        locationManager.requestAlwaysAuthorization()
+        self.navigationItem.title = "Loading..."
+        locationManager.requestLocation()
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    // MARK: - CLLocationManagerDelegate
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let myCurrentLocation = locations.first {
+            let lat = myCurrentLocation.coordinate.latitude
+            let long = myCurrentLocation.coordinate.longitude
+            
+            self.navigationItem.title = "Map"
+            
+            mapView.region = setInitialRegion(lat: lat, long: long)
+        }
     }
-    */
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
+        print("Failed to find user's location: \(error.localizedDescription)")
+    }
+    
+    // MARK: - Methods
+    func setInitialRegion(lat: CLLocationDegrees, long: CLLocationDegrees) -> MKCoordinateRegion {
+        MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: lat, longitude: long), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+    }
 
 }

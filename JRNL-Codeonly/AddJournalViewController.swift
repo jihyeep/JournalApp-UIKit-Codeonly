@@ -150,8 +150,27 @@ class AddJournalViewController: UIViewController, CLLocationManagerDelegate, UIT
         locationManager.requestAlwaysAuthorization() // 사용자 동의
     }
     
-    // MARK: - Methods
+    // MARK: - CLLocationManagerDelegate
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let myCurrentLocation = locations.first {
+            currentLocation = myCurrentLocation
+            if let label = toggleView.viewWithTag(LABEL_VIEW_TAG) as? UILabel {
+                label.text = "Done"
+            }
+            updateSaveButtonState()
+        }
+    }
     
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
+        print("Failed to find user's location: \(error.localizedDescription)")
+    }
+    
+    // MARK: - UITextViewDelegate
+    func textViewDidChange(_ textView: UITextView) {
+        updateSaveButtonState()
+    }
+    
+    // MARK: - Methods
     func updateSaveButtonState() {
         if locationSwitchIsOn {
             guard let title = titleTextField.text, !title.isEmpty,
@@ -207,24 +226,5 @@ class AddJournalViewController: UIViewController, CLLocationManagerDelegate, UIT
     @objc func textChanged(sender: UITextField) {
         updateSaveButtonState()
     }
-
-    // MARK: - CLLocationManagerDelegate
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let myCurrentLocation = locations.first {
-            currentLocation = myCurrentLocation
-            if let label = toggleView.viewWithTag(LABEL_VIEW_TAG) as? UILabel {
-                label.text = "Done"
-            }
-            updateSaveButtonState()
-        }
-    }
     
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
-        print("Failed to find user;s location: \(error.localizedDescription)")
-    }
-    
-    // MARK: - UITextViewDelegate
-    func textViewDidChange(_ textView: UITextView) {
-        updateSaveButtonState()
-    }
 }
