@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import MapKit
 
 class JournalDetailViewController: UITableViewController {
     let journalEntry: JournalEntry
@@ -43,6 +44,26 @@ class JournalDetailViewController: UITableViewController {
         imageView.image = UIImage(systemName: "face.smiling")
         imageView.contentMode = .scaleAspectFill
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        
+        guard let lat = journalEntry.latitude,
+              let long = journalEntry.longitude else {
+            return imageView
+        }
+        let location = CLLocationCoordinate2D(latitude: lat, longitude: long)
+        let region = MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+        
+        let options = MKMapSnapshotter.Options()
+        options.region = region
+        options.size = CGSize(width: 300, height: 300)
+        
+        let shotter = MKMapSnapshotter(options: options)
+        shotter.start { result, error in
+            guard let snapshot = result else {
+                print("Snapshot error: \(error?.localizedDescription ?? "")")
+                return
+            }
+            imageView.image = snapshot.image
+        }
         return imageView
     }()
     
@@ -159,5 +180,10 @@ class JournalDetailViewController: UITableViewController {
         default: return 44.5
         }
     }
+    
+    // MARK: - Methods
+//    func setInitialRegion(lat: CLLocationDegrees, long: CLLocationDegrees) -> MKCoordinateRegion {
+//        MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: lat, longitude: long), span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
+//    }
 
 }
