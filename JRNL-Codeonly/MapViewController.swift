@@ -13,6 +13,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
     
     let locationManager = CLLocationManager()
     
+    var sampleJournalEntryData = SampleJournalEntryData()
+    
     private lazy var mapView: MKMapView = {
         let mapView = MKMapView()
         mapView.translatesAutoresizingMaskIntoConstraints = false
@@ -38,6 +40,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
         locationManager.requestAlwaysAuthorization()
         self.navigationItem.title = "Loading..."
         locationManager.requestLocation()
+        
+        // 샘플 데이터 생성
+        sampleJournalEntryData.createSampleJournalEntryData()
+        // 어노테이션 추가
+        mapView.addAnnotations(sampleJournalEntryData.journalEntries)
     }
     
     // MARK: - CLLocationManagerDelegate
