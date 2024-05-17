@@ -6,16 +6,22 @@
 //
 
 import UIKit
+import CoreLocation
 
 protocol AddJournalControllerDelegate: NSObject {
     func saveJournalEntry(_ journalEntry: JournalEntry)
 }
 
-class AddJournalViewController: UIViewController {
+class AddJournalViewController: UIViewController, CLLocationManagerDelegate {
     
     // weak var journalListViewController: JournalListViewController?
     // 의존 분리를 위해 직접 뷰 컨트롤러를 담기보다, 델리게이트 프로토콜을 이용함
     weak var delegate: AddJournalControllerDelegate?
+    
+    final let LABEL_VIEW_TAG = 1001
+    
+    let locationManager = CLLocationManager()
+    var currentLocation: CLLocation?
     
     private lazy var mainContainer: UIStackView = {
         let stackView = UIStackView()
@@ -41,9 +47,15 @@ class AddJournalViewController: UIViewController {
         stackView.alignment = .fill
         stackView.distribution = .fill
         stackView.spacing = 8 // switch와 label 사이 간격
+        
         let switchComponent = UISwitch()
+        switchComponent.isOn = false
+        switchComponent.addTarget(self, action: #selector(valueChanged(sender:)), for: .valueChanged)
+        
         let labelComponent = UILabel()
-        labelComponent.text = "Switch Label"
+        labelComponent.text = "Get Location"
+        labelComponent.tag = LABEL_VIEW_TAG
+        
         stackView.addArrangedSubview(switchComponent)
         stackView.addArrangedSubview(labelComponent)
         
@@ -122,7 +134,12 @@ class AddJournalViewController: UIViewController {
             imageView.widthAnchor.constraint(equalToConstant: 200),
             imageView.heightAnchor.constraint(equalToConstant: 200)
         ])
+        
+        locationManager.delegate = self
+        locationManager.requestAlwaysAuthorization() // 사용자 동의
     }
+    
+    // MARK: - Methods
     
     @objc func save() {
         guard let title = titleTextField.text, !title.isEmpty,
@@ -130,7 +147,10 @@ class AddJournalViewController: UIViewController {
             return
         }
         
-        let journalEntry = JournalEntry(rating: 3, title: title, body: body, photo: UIImage(systemName: "face.smiling"))!
+        let lat = currentLocation?.coordinate.latitude
+        let long = currentLocation?.coordinate.longitude
+        
+        let journalEntry = JournalEntry(rating: 3, title: title, body: body, photo: UIImage(systemName: "face.smiling"), latitude: lat, longitude: long)!
         delegate?.saveJournalEntry(journalEntry)
         dismiss(animated: true)
     }
@@ -138,15 +158,34 @@ class AddJournalViewController: UIViewController {
     @objc func cancel() {
         dismiss(animated: true)
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
+    
+    @objc func valueChanged(sender: UISwitch) {
+        if sender.isOn {
+            if let label = toggleView.viewWithTag(LABEL_VIEW_TAG) as? UILabel {
+                label.text = "Getting location..."
+            }
+            locationManager.requestLocation()
+        } else {
+            currentLocation = nil
+            if let label = toggleView.viewWithTag(LABEL_VIEW_TAG) as? UILabel {
+                label.text = "Get location"
+            }
+        }
     }
-    */
 
+    // MARK: - CLLocationManagerDelegate
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let myCurrentLocation = locations.first {
+            currentLocation = myCurrentLocation
+            if let label = toggleView.viewWithTag(LABEL_VIEW_TAG) as? UILabel {
+                label.text = "Done"
+            }
+            // TODO: updateButtonState
+            
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
+        print("Failed to find user;s location: \(error.localizedDescription)")
+    }
 }

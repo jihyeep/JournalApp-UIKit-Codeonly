@@ -10,27 +10,27 @@ import UIKit
 class JournalEntry {
     // MARK: - Properties
     let date: Date
-    let rate: Int
+    let rating: Int
     let entryTitle: String
     let entryBody: String
     let photo: UIImage?
     let latitude: Double?
-    let logitude: Double?
+    let longitude: Double?
     
     // MARK: Initialization
     // nil일 수도 있기 때문에 옵셔널 지정
-    init?(rating: Int, title: String, body: String, photo: UIImage? = nil, latitude: Double? = nil, logitude: Double? = nil) {
+    init?(rating: Int, title: String, body: String, photo: UIImage? = nil, latitude: Double? = nil, longitude: Double? = nil) {
         // 데이터 정합성(validation) 체크 - 해당하면 생성이 안됨
         if title.isEmpty || body.isEmpty || rating < 0 || rating > 5 {
             return nil
         }
         self.date = Date()
-        self.rate = rating
+        self.rating = rating
         self.entryTitle = title
         self.entryBody = body
         self.photo = photo
         self.latitude = latitude
-        self.logitude = logitude
+        self.longitude = longitude
     }
 }
 
