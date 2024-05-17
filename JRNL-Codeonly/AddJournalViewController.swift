@@ -12,7 +12,7 @@ protocol AddJournalControllerDelegate: NSObject {
     func saveJournalEntry(_ journalEntry: JournalEntry)
 }
 
-class AddJournalViewController: UIViewController, CLLocationManagerDelegate, UITextViewDelegate {
+class AddJournalViewController: UIViewController, CLLocationManagerDelegate, UITextViewDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     // weak var journalListViewController: JournalListViewController?
     // 의존 분리를 위해 직접 뷰 컨트롤러를 담기보다, 델리게이트 프로토콜을 이용함
@@ -86,7 +86,10 @@ class AddJournalViewController: UIViewController, CLLocationManagerDelegate, UIT
     
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "face.smiling")?.withRenderingMode(.alwaysOriginal) // 원본 색상으로 렌더링
+        imageView.image = UIImage(systemName: "face.smiling")
+        imageView.isUserInteractionEnabled = true
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(imageTapped))
+        imageView.addGestureRecognizer(tapGestureRecognizer)
         
         return imageView
     }()
@@ -170,6 +173,22 @@ class AddJournalViewController: UIViewController, CLLocationManagerDelegate, UIT
         updateSaveButtonState()
     }
     
+    // MARK: - UIImagePickerControllerDelegate
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        // 이미지 선택
+        guard let selectedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else {
+            fatalError("Expected a dictionary containing an image: \(info)")
+        }
+        // 선택된 이미지 썸네일 크기 지정
+        let smallerImage = selectedImage.preparingThumbnail(of: CGSize(width: 300, height: 300))
+        imageView.image = smallerImage
+        dismiss(animated: true)
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true)
+    }
+    
     // MARK: - Methods
     func updateSaveButtonState() {
         if locationSwitchIsOn {
@@ -200,7 +219,7 @@ class AddJournalViewController: UIViewController, CLLocationManagerDelegate, UIT
         let lat = currentLocation?.coordinate.latitude
         let long = currentLocation?.coordinate.longitude
         
-        let journalEntry = JournalEntry(rating: rating, title: title, body: body, photo: UIImage(systemName: "face.smiling"), latitude: lat, longitude: long)!
+        let journalEntry = JournalEntry(rating: rating, title: title, body: body, photo: imageView.image, latitude: lat, longitude: long)!
         delegate?.saveJournalEntry(journalEntry)
         dismiss(animated: true)
     }
@@ -226,6 +245,13 @@ class AddJournalViewController: UIViewController, CLLocationManagerDelegate, UIT
     
     @objc func textChanged(sender: UITextField) {
         updateSaveButtonState()
+    }
+    
+    @objc func imageTapped() {
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.delegate = self
+        imagePickerController.sourceType = .photoLibrary
+        present(imagePickerController, animated: true)
     }
     
 }
