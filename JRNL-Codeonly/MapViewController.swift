@@ -13,7 +13,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
     
     let locationManager = CLLocationManager()
     
-    var sampleJournalEntryData = SampleJournalEntryData()
+//    var sampleJournalEntryData = SampleJournalEntryData()
     
     private lazy var mapView: MKMapView = {
         let mapView = MKMapView()
@@ -39,13 +39,18 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
         
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
+        locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
         self.navigationItem.title = "Loading..."
-        locationManager.requestLocation()
         
         // 샘플 데이터 생성
-        sampleJournalEntryData.createSampleJournalEntryData()
+//        sampleJournalEntryData.createSampleJournalEntryData()
         // 어노테이션 추가
-        mapView.addAnnotations(sampleJournalEntryData.journalEntries)
+//        mapView.addAnnotations(sampleJournalEntryData.journalEntries)
+    }
+    
+    override func viewIsAppearing(_ animated: Bool) {
+        super.viewIsAppearing(animated)
+        locationManager.requestLocation() // 위치 파악(viewDidLoad에서 이동)
     }
     
     // MARK: - CLLocationManagerDelegate
@@ -55,8 +60,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
             let long = myCurrentLocation.coordinate.longitude
             
             self.navigationItem.title = "Map"
-            
             mapView.region = setInitialRegion(lat: lat, long: long)
+            mapView.addAnnotations(SharedData.shared.getAllJournalEntries()) // entry 수에 따라 성능 문제 발생 가능
         }
     }
     

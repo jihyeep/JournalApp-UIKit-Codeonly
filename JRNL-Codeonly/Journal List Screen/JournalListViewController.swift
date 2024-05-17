@@ -14,12 +14,12 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
         return tableView
     }()
     
-    var sampleJournalEntryData = SampleJournalEntryData()
+//    var sampleJournalEntryData = SampleJournalEntryData()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        sampleJournalEntryData.createSampleJournalEntryData()
+//        sampleJournalEntryData.createSampleJournalEntryData()
         
         // delegation 설정
         tableView.dataSource = self
@@ -53,21 +53,32 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
     // MARK: - UITableViewDataSource
     // 테이블뷰 행 설정
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        sampleJournalEntryData.journalEntries.count
+//        sampleJournalEntryData.journalEntries.count
+        SharedData.shared.numberOfJournalEntries()
     }
     // 테이블뷰 행에 셀 설정
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "journalCell", for: indexPath) as! JournalListTableViewCell
-        let journalEntry = sampleJournalEntryData.journalEntries[indexPath.row]
+//        let journalEntry = sampleJournalEntryData.journalEntries[indexPath.row]
+        let journalEntry = SharedData.shared.getJournalEntry(index: indexPath.row)
         cell.configureCell(journalEntry: journalEntry)
         
         return cell
     }
     
+    // 데이터 삭제
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            SharedData.shared.removeJournalEntry(index: indexPath.row)
+            tableView.reloadData()
+        }
+    }
+    
     // MARK: - UITableViewDelegate
     // 테이블뷰 행 클릭 시 디테일 뷰 보여짐
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let journalEntry = sampleJournalEntryData.journalEntries[indexPath.row]
+//        let journalEntry = sampleJournalEntryData.journalEntries[indexPath.row]
+        let journalEntry = SharedData.shared.getJournalEntry(index: indexPath.row)
         let journalDetailViewController = JournalDetailViewController(journalEntry: journalEntry)
         show(journalDetailViewController, sender: self)
     }
@@ -88,7 +99,8 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
     }
     
     public func saveJournalEntry(_ journalEntry: JournalEntry) {
-        sampleJournalEntryData.journalEntries.append(journalEntry)
+//        sampleJournalEntryData.journalEntries.append(journalEntry)
+        SharedData.shared.addJournalEntry(newJournalEntry: journalEntry)
         tableView.reloadData() // 화면갱신 필수
     }
 
