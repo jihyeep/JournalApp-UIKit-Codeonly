@@ -86,7 +86,7 @@ class AddJournalViewController: UIViewController, CLLocationManagerDelegate, UIT
     
     private lazy var imageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "face.smiling")
+        imageView.image = UIImage(systemName: "face.smiling")?.withRenderingMode(.alwaysOriginal) // 원본 색상으로 렌더링
         
         return imageView
     }()

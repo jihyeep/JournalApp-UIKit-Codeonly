@@ -48,6 +48,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, MKMapViewD
 //        mapView.addAnnotations(sampleJournalEntryData.journalEntries)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        SharedData.shared.loadJournalEntriesData()
+    }
+    
     override func viewIsAppearing(_ animated: Bool) {
         super.viewIsAppearing(animated)
         locationManager.requestLocation() // 위치 파악(viewDidLoad에서 이동)

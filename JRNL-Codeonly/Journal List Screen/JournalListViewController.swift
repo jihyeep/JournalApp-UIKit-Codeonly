@@ -50,6 +50,11 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
                                                             action: #selector(addJournal))
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        SharedData.shared.loadJournalEntriesData()
+    }
+    
     // MARK: - UITableViewDataSource
     // 테이블뷰 행 설정
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -70,6 +75,7 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             SharedData.shared.removeJournalEntry(index: indexPath.row)
+            SharedData.shared.saveJournalEntriesData() // 변경 저장
             tableView.reloadData()
         }
     }
@@ -101,6 +107,7 @@ class JournalListViewController: UIViewController, UITableViewDataSource, UITabl
     public func saveJournalEntry(_ journalEntry: JournalEntry) {
 //        sampleJournalEntryData.journalEntries.append(journalEntry)
         SharedData.shared.addJournalEntry(newJournalEntry: journalEntry)
+        SharedData.shared.saveJournalEntriesData() // 변경 저장
         tableView.reloadData() // 화면갱신 필수
     }
 

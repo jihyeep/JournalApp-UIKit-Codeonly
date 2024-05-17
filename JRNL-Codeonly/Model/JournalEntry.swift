@@ -44,6 +44,7 @@ class JournalEntry: NSObject, MKAnnotation, Codable {
         self.longitude = longitude
     }
     
+    // MKAnnotation 프로토콜을 위한 프로퍼티들
     var coordinate: CLLocationCoordinate2D {
         guard let lat = latitude,
               let long = longitude else {
@@ -52,13 +53,13 @@ class JournalEntry: NSObject, MKAnnotation, Codable {
         return CLLocationCoordinate2D(latitude: lat, longitude: long)
     }
     
-//    var title: String? {
-//        date.formatted(.dateTime.year().month().day())
-//    }
-//    
-//    var subtitle: String? {
-//        entryTitle
-//    }
+    var title: String? {
+        date.formatted(.dateTime.year().month().day())
+    }
+    
+    var subtitle: String? {
+        entryTitle
+    }
     
     // 수동으로 encoder, decoder를 만들어주기 위함
     enum CodingKeys: String, CodingKey {
